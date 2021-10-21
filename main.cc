@@ -29,15 +29,13 @@ int main(int argc, char const *argv[] ){
     Rectangular card;
     
     card
-    .color   ()
-    .padding ()
-    .cornerRadius(78)
-    .show    ();
+    .color        ()
+    .padding      (300, M_GLU_Padding_all)
+    .cornerRadius (50)
+    .show         ();
     
     
     Monitor::snapshot();
-    
-    
     
 }
 

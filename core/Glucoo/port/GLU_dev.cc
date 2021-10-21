@@ -50,6 +50,8 @@ E_Status_t Monitor::snapshot ( void ){
     
 #endif
     
+    std::string cmd = "open "+dir;
+    system(cmd.c_str());
     return MAKE_ENUM(kStatus_Success);
 }
 

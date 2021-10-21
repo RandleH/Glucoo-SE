@@ -45,8 +45,8 @@ public:
     Rectangular( void );
    ~Rectangular( void );
     
-    Rectangular& padding          ( void );//
-    Rectangular& padding          (var pix);//
+    Rectangular& padding          ( void );
+    Rectangular& padding          (var pix);
     Rectangular& padding          (var pix, content M_GLU_Padding_xxx);//
     
     Rectangular& cornerRadius     (var radius);//

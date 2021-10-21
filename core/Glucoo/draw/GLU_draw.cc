@@ -34,7 +34,22 @@ struct Info_Rectangular{
     //...//
 };
 typedef struct Info_Rectangular* pInfo_Rectangular;
-#define RectangularInfo      ((pInfo_Rectangular)(this->_info))
+#define RectangularInfo         ((pInfo_Rectangular)(this->_info))
+
+#define LIMIT_RECTANGULAR_HORIZONTAL_AREA do{\
+    RectangularInfo->area.xs = RH_LIMIT(RectangularInfo->area.xs, RectangularInfo->area.xs, (this->_area.xs+this->_area.w)/2);\
+    RectangularInfo->area.w  = RH_LIMIT(RectangularInfo->area.w , 0, RectangularInfo->area.w);\
+}while(0)
+
+#define LIMIT_RECTANGULAR_VERTICAL_AREA do{\
+    RectangularInfo->area.ys = RH_LIMIT(RectangularInfo->area.ys, RectangularInfo->area.ys, (this->_area.ys+this->_area.h)/2);\
+    RectangularInfo->area.h  = RH_LIMIT(RectangularInfo->area.h , 0, RectangularInfo->area.h);\
+}while(0)
+
+#define LIMIT_RECTANGULAR_AREA  do{\
+    LIMIT_RECTANGULAR_HORIZONTAL_AREA ;\
+    LIMIT_RECTANGULAR_VERTICAL_AREA   ;\
+}while(0)
 
 Rectangular::Rectangular( void ){
     this->_area.xs = 0;
@@ -53,16 +68,54 @@ Rectangular& Rectangular::padding( void ){
     RectangularInfo->area.w  -= DEFAULT_PADDING<<1;
     RectangularInfo->area.h  -= DEFAULT_PADDING<<1;
     
-    RectangularInfo->area.xs = RH_LIMIT(RectangularInfo->area.xs, RectangularInfo->area.xs, (this->_area.xs+this->_area.w)/2);
-    RectangularInfo->area.ys = RH_LIMIT(RectangularInfo->area.ys, RectangularInfo->area.ys, (this->_area.ys+this->_area.h)/2);
-    RectangularInfo->area.w  = RH_LIMIT(RectangularInfo->area.w , 0, RectangularInfo->area.w);
-    RectangularInfo->area.h  = RH_LIMIT(RectangularInfo->area.h , 0, RectangularInfo->area.h);
+    LIMIT_RECTANGULAR_AREA;
     
     RectangularInfo->padMethod = M_GLU_Padding_all;
     return *this;
 }
 
+Rectangular& Rectangular::padding(var pix){
+    
+    if(pix > this->_area.h && pix > this->_area.w){
+        RectangularInfo->area.xs =  RectangularInfo->area.ys =  RectangularInfo->area.w =  RectangularInfo->area.h = 0;
+        return *this;
+    }
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_top ){
+        RectangularInfo->area.ys += pix;
+    }
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_bottom ){
+        RectangularInfo->area.h  -= pix<<1;
+    }
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_leading ){
+        RectangularInfo->area.xs += pix;
+    }
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_trailing ){
+        RectangularInfo->area.w  -= pix<<1;
+    }
+    
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_vertical ){
+        LIMIT_RECTANGULAR_VERTICAL_AREA;
+    }
+    
+    if( RectangularInfo->padMethod & M_GLU_Padding_horizontal ){
+        LIMIT_RECTANGULAR_HORIZONTAL_AREA;
+    }
+    
+    return *this;
+}
 
+Rectangular& Rectangular::padding(var pix, content M_GLU_Padding_xxx){
+    if( M_GLU_Padding_xxx > M_GLU_Padding_all) return *this;
+    
+    RectangularInfo->padMethod = M_GLU_Padding_xxx;
+    
+    return this->padding(pix);
+}
 
 Rectangular& Rectangular::cornerRadius(var radius){
     radius = RH_LIMIT( radius, 0, RectangularInfo->area.w/2);
@@ -109,7 +162,7 @@ Rectangular::~Rectangular( void ){
 }
 
 
-
+#undef RectangularInfo
 
 
 
